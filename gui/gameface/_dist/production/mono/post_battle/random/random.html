@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blank</title>
+    <script type="module" crossorigin src="../random/bundle.js"></script>
+    <link rel="stylesheet" crossorigin href="../chunks/lib.css">
+    <link rel="stylesheet" crossorigin href="../chunks/global.css">
+    <link rel="stylesheet" crossorigin href="../random/random.css">
+    <style>
+      /* res_mods: per-tab background
+         overview tab  -> bg_overview.png
+         other tabs    -> bg_win / bg_lose / bg_draw */
+      #rm-bg {
+        position: fixed;
+        top: 0; right: 0; bottom: 0; left: 0;
+        z-index: -1;
+        background-position: center center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 200ms ease;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="rm-bg"></div>
+    <div id="root"></div>
+
+    <script>
+    (function () {
+        var ART = { win: "win.png", lose: "lose.png", draw: "draw.png" };
+        var CORNER_BR = { win: "win1.png", lose: "lose1.png", draw: "draw1.png" };
+        var CORNER_TL = { win: "win2.png", lose: "lose2.png", draw: "draw2.png" };
+        var BG = { win: "bg_win.png", lose: "bg_lose.png", draw: "bg_draw.png" };
+        var BG_OVERVIEW = "bg_overview.png";   // bj01.png
+        var OVERVIEW_OPACITY = 1.0;            // 0..1 for the overview tab
+        // All sizes are viewport-relative so the same sheet works on 1080p and 2K.
+        // (values in parentheses are the 1080p pixel equivalents)
+        var HEIGHT = 37.04;    // vh  (~400px @1080p)
+        var LEFT = 0.83;       // vw  (16px)
+        var BOTTOM = 6.85;     // vh  (74px)
+
+        // corner decorations
+        var TL_H = 24.07, TL_TOP = 5.74, TL_LEFT = 0.73;      // vh / vh / vw
+        var BR_H = 30.09, BR_BOTTOM = 8.89, BR_RIGHT = 0.73;  // vh / vh / vw
+
+        var img = document.createElement("img");
+        img.alt = "";
+        img.style.cssText =
+            "position:fixed;left:" + LEFT + "vw;bottom:" + BOTTOM + "vh;" +
+            "height:" + HEIGHT + "vh;width:auto;pointer-events:none;" +
+            "z-index:9999;opacity:0;transition:opacity 250ms ease;";
+        document.body.appendChild(img);
+
+        var cornerTL = document.createElement("img");
+        cornerTL.alt = "";
+        cornerTL.style.cssText =
+            "position:fixed;left:" + TL_LEFT + "vw;top:" + TL_TOP + "vh;" +
+            "height:" + TL_H + "vh;width:auto;pointer-events:none;" +
+            "z-index:9998;opacity:0;transition:opacity 250ms ease;";
+        document.body.appendChild(cornerTL);
+
+        var cornerBR = document.createElement("img");
+        cornerBR.alt = "";
+        cornerBR.style.cssText =
+            "position:fixed;right:" + BR_RIGHT + "vw;bottom:" + BR_BOTTOM + "vh;" +
+            "height:" + BR_H + "vh;width:auto;pointer-events:none;" +
+            "z-index:9998;opacity:0;transition:opacity 250ms ease;";
+        document.body.appendChild(cornerBR);
+
+        var bg = document.getElementById("rm-bg");
+
+        function kindFromText(raw) {
+            var t = (raw || "").toUpperCase();
+            if (!t.trim()) return null;
+            if (t.indexOf("\u5E73") >= 0 || t.indexOf("DRAW") >= 0) return "draw";
+            if (t.indexOf("\u80DC") >= 0 || t.indexOf("VICTORY") >= 0 || t.indexOf("WIN") >= 0) return "win";
+            return "lose";
+        }
+
+        var current = null, seen = null, bgKey = null, cornerCurrent = null;
+        function tick() {
+            var el = document.querySelector('[data-test-id="winStatus"]');
+            var kind = el ? kindFromText(el.textContent) : null;
+            if (kind) seen = kind;
+
+            var show = kind || seen;
+            if (show !== current) {
+                current = show;
+                if (show) {
+                    img.src = ART[show];
+                    img.style.opacity = "1";
+                } else {
+                    img.style.opacity = "0";
+                }
+            }
+
+            // is the overview tab the visible one?
+            var isOverview = false;
+            if (el) {
+                var r = el.getBoundingClientRect();
+                var cs = getComputedStyle(el);
+                isOverview = r.width > 0 && r.height > 0 &&
+                             cs.display !== "none" && cs.visibility !== "hidden";
+            }
+
+            var wantKey = isOverview ? "overview" : (seen ? seen : null);
+            if (wantKey !== bgKey) {
+                bgKey = wantKey;
+                if (!wantKey) {
+                    bg.style.opacity = "0";
+                } else {
+                    var file = (wantKey === "overview") ? BG_OVERVIEW : BG[wantKey];
+                    bg.style.backgroundImage = 'url("' + file + '")';
+                    bg.style.opacity = (wantKey === "overview") ? String(OVERVIEW_OPACITY) : "1";
+                }
+            }
+
+            // corner art only on the overview tab (other tabs have tables there)
+            var cornerKind = isOverview ? (kind || seen) : null;
+            if (cornerKind !== cornerCurrent) {
+                cornerCurrent = cornerKind;
+                if (cornerKind) {
+                    cornerTL.src = CORNER_TL[cornerKind];
+                    cornerBR.src = CORNER_BR[cornerKind];
+                    cornerTL.style.opacity = "1";
+                    cornerBR.style.opacity = "1";
+                } else {
+                    cornerTL.style.opacity = "0";
+                    cornerBR.style.opacity = "0";
+                }
+            }
+
+            requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+    })();
+    </script>
+  </body>
+</html>

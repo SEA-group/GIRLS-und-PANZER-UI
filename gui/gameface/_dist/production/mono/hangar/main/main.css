@@ -10998,7 +10998,9 @@ html[lang=ja] .Banner_container__medium_be866d52, html[lang=ko] .Banner_containe
 [class*="MenuItem"] *{color:#4FA3FF !important;}
 [class*="Header_playlist"],[class*="Header_title"] [class*="Header_text"]{color:#4FA3FF !important;}
 [class*="Header_title"] *{color:#4FA3FF !important;}
-/* logo above battle mode */
-body::before{content:"";position:fixed;left:30rem;top:72rem;width:137rem;height:64rem;background:url("szlogo.png") center/contain no-repeat;z-index:2147483000;pointer-events:none;}
-/* you.png at the very top-left corner */
-body::after{content:"";position:fixed;left:0;top:0;width:66rem;height:76rem;background:url("you.png") center/contain no-repeat;z-index:2147483000;pointer-events:none;}
+/* 左下角立绘：放到 body::before —— 它在 DOM 里排在 #root 之前，同一层级下所有界面都会盖住它 */
+body::before{content:"";position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:0;background:url("54103314_p0.png") 20rem 590rem/108rem 200rem no-repeat;}
+/* 顶部 logo + 左上角 you.png：放在 body::after，排在最后，保持最上层 */
+body::after{content:"";position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:2147483000;background-image:url("szlogo.png"),url("you.png");background-position:30rem 72rem,0 0;background-size:137rem 64rem,66rem 76rem;background-repeat:no-repeat;}
+/* 过滤面板等弹窗强制抬到立绘之上（无论它自身有没有定位） */
+[class*="playlistPortal"],[class*="DialogTemplate"]{z-index:5 !important;}
