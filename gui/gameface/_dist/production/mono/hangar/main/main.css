@@ -7730,7 +7730,7 @@ html[lang=vi] .FilterPopover_inputPlaceholder_5ac00a5 {
 }
 .Emblem_base__x240x240_308c1aa9 {
   width: 240rem;
-  height: 240rem;
+  height: 300rem;
 }
 .Emblem_base__x360x360_98f20cf9 {
   width: 360rem;
@@ -11004,3 +11004,61 @@ body::before{content:"";position:fixed;left:0;top:0;width:100vw;height:100vh;poi
 body::after{content:"";position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:2147483000;background-image:url("szlogo.png"),url("you.png");background-position:30rem 72rem,0 0;background-size:137rem 64rem,66rem 76rem;background-repeat:no-repeat;}
 /* 过滤面板等弹窗强制抬到立绘之上（无论它自身有没有定位） */
 [class*="playlistPortal"],[class*="DialogTemplate"]{z-index:5 !important;}
+
+/* ================= res_mods 覆盖（只做这几件事） ================= */
+
+/* 1) 左下立绘 5410.png：左下角锚定 */
+body::before{
+  content: "" !important;
+  position: fixed !important;
+  left: 38rem !important;
+  top: auto !important;
+  bottom: 208rem !important;
+  width: 347rem !important;
+  height: 642rem !important;
+  background: url("5410.png") center center / contain no-repeat !important;
+  pointer-events: none !important;
+  z-index: -1 !important;
+}
+
+/* 2) 右下立绘 3211.png */
+html::before{
+  content: "" !important;
+  position: fixed !important;
+  right: 30rem !important;
+  bottom: 228rem !important;
+  width: 174rem !important;
+  height: 360rem !important;
+  background: url("3211.png") center center / contain no-repeat !important;
+  pointer-events: none !important;
+  z-index: -1 !important;
+}
+
+/* 3) 整屏边框阴影（官方 vignette，压淡 0.2） */
+html::after{
+  content: "" !important;
+  position: fixed !important;
+  top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+  background: url("vignette_official.png") center center / 100% 100% no-repeat !important;
+  pointer-events: none !important;
+  opacity: 0.2 !important;
+  z-index: 500 !important;
+}
+
+/* 4) 蜂巢底纹：中间 50% 透明，向四边羽化 */
+#root::before{
+  content: "" !important;
+  position: fixed !important;
+  top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+  background: url("honeycomb.svg") repeat !important;
+  background-size: 54rem 94rem !important;
+  opacity: 0.5 !important;
+  pointer-events: none !important;
+  z-index: -2 !important;
+  -webkit-mask-image: radial-gradient(ellipse closest-side at 50% 50%,
+      rgba(0,0,0,0) 0%, rgba(0,0,0,0) 50%,
+      rgba(0,0,0,0.55) 78%, rgba(0,0,0,1) 100%) !important;
+  mask-image: radial-gradient(ellipse closest-side at 50% 50%,
+      rgba(0,0,0,0) 0%, rgba(0,0,0,0) 50%,
+      rgba(0,0,0,0.55) 78%, rgba(0,0,0,1) 100%) !important;
+}
